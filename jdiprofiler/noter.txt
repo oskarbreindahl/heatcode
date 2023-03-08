@@ -1,0 +1,2 @@
+compile med -g flag -> debugger information "Generate all debugging info"
+compile dummy -> debuggee -> debugger (intellij?)
