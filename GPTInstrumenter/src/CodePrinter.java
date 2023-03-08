@@ -76,8 +76,8 @@ public class CodePrinter implements ClassFileTransformer {
 
     //Written by ChatGPT
     public static void premain(String agentArgs, Instrumentation inst) {
-        deleteDirectory("./Output");
-        String outputDir = "Output";
+        deleteDirectory("../output");
+        String outputDir = "../output";
         inst.addTransformer(new CodePrinter(outputDir));
     }
 }
