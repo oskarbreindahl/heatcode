@@ -115,8 +115,7 @@ fabric.properties
 .idea/**/azureSettings.xml
 
 ### Java ###
-# Compiled class file
-*.class
+# *.class
 
 # Log file
 *.log
@@ -128,7 +127,6 @@ fabric.properties
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.nar
 *.ear
