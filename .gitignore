@@ -115,7 +115,8 @@ fabric.properties
 .idea/**/azureSettings.xml
 
 ### Java ###
-# *.class
+# Compiled class file
+*.class
 
 # Log file
 *.log
