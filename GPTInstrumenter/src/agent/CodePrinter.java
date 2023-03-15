@@ -1,3 +1,5 @@
+package agent;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
@@ -76,8 +78,8 @@ public class CodePrinter implements ClassFileTransformer {
 
     //Written by ChatGPT
     public static void premain(String agentArgs, Instrumentation inst) {
-        deleteDirectory("../output");
-        String outputDir = "../output";
+        deleteDirectory("./output");
+        String outputDir = "./output";
         inst.addTransformer(new CodePrinter(outputDir));
     }
 }
