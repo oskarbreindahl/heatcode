@@ -11,6 +11,8 @@
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+decomps
+
 
 # AWS User-specific
 .idea/**/aws.xml
