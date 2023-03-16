@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="jdicli:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/jdicli_jar</output-path>
+    <root id="archive" name="jdicli.jar">
+      <element id="module-output" name="jdicli" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.13.3/jackson-databind-2.13.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.13.3/jackson-annotations-2.13.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.13.3/jackson-core-2.13.3.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

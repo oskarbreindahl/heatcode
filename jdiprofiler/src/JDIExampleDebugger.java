@@ -19,7 +19,7 @@ public class JDIExampleDebugger {
         enableClassPrepareRequest();
         enableMethodEntryRequest();
     }
-    public void run() {
+    public void run() throws Exception {
         try {
             EventSet eventSet = null;
             while ((eventSet = vm.eventQueue().remove()) != null) {
@@ -37,7 +37,8 @@ public class JDIExampleDebugger {
             }
         } catch (VMDisconnectedException e) {
             System.out.println("Virtual Machine is disconnected.");
-            callContainer.print();
+            //callContainer.print();
+            System.out.println(JsonSerializer.serialize(callContainer));
         } catch (Exception e) {
             e.printStackTrace();
         }
