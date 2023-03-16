@@ -1,42 +1,35 @@
 import com.sun.jdi.*;
-import com.sun.jdi.connect.Connector;
-import com.sun.jdi.connect.LaunchingConnector;
 import com.sun.jdi.event.*;
-import com.sun.jdi.request.BreakpointRequest;
-import com.sun.jdi.request.ClassPrepareRequest;
-import com.sun.jdi.request.MethodEntryRequest;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+import java.util.jar.JarFile;
 
 public class JDIExampleDebugger {
-    private Class debugClass;
-    private int[] breakPointLines;
+    private String debugJar;
+    private List<String> filteredClasses = List.of("java.*", "jdk.*", "com.sun.*", "sun.*", "javax.*",
+            "com.apple.*", "apple.*");
+    private VirtualMachine vm;
+    private CallContainer callContainer;
 
-    private List<String> filteredClasses = List.of("java.*", "jdk.*", "com.sun.*", "sun.*", "javax.*");
-
-    public static void main(String[] args) throws Exception {
-        JDIExampleDebugger debuggerInstance = new JDIExampleDebugger();
-        debuggerInstance.setDebugClass(calculator.Main.class);
-        int[] breakPoints = {7,  13};
-        debuggerInstance.setBreakPointLines(breakPoints);
-        VirtualMachine vm = null;
+    public JDIExampleDebugger(String jar) throws Exception {
+        this.debugJar = jar;
+        this.callContainer = new CallContainer();
+        connectAndLaunchVM();
+        enableClassPrepareRequest();
+        enableMethodEntryRequest();
+    }
+    public void run() {
         try {
-            vm = debuggerInstance.connectAndLaunchVM();
-            debuggerInstance.enableClassPrepareRequest(vm);
-            debuggerInstance.enableMethodEntryRequest(vm);
             EventSet eventSet = null;
             while ((eventSet = vm.eventQueue().remove()) != null) {
                 for (Event event : eventSet) {
                     if (event instanceof ClassPrepareEvent) {
-                        //debuggerInstance.setBreakPoints(vm, (ClassPrepareEvent)event);
                         System.out.println("loaded class " + ((ClassPrepareEvent) event).referenceType().name());
-                    }
-                    if (event instanceof BreakpointEvent) {
-                        debuggerInstance.displayVariables((BreakpointEvent) event);
                     }
                     if (event instanceof MethodEntryEvent) {
                         var method = ((MethodEntryEvent) event).method();
+                        callContainer.call(method);
                         System.out.println("entered " + method.name() + " in " + method.declaringType().name());
                     }
                     vm.resume();
@@ -44,75 +37,48 @@ public class JDIExampleDebugger {
             }
         } catch (VMDisconnectedException e) {
             System.out.println("Virtual Machine is disconnected.");
+            callContainer.print();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void enableClassPrepareRequest(VirtualMachine vm) {
-        ClassPrepareRequest classPrepareRequest = vm.eventRequestManager().createClassPrepareRequest();
-        //classPrepareRequest.addClassFilter(debugClass.getName());
+    public static void main(String[] args) throws Exception {
+        var debugger = new JDIExampleDebugger(args[0]);
+        debugger.run();
+    }
+
+    public void enableClassPrepareRequest() {
+        var classPrepareRequest = vm.eventRequestManager().createClassPrepareRequest();
         filteredClasses.forEach(classPrepareRequest::addClassExclusionFilter);
         classPrepareRequest.enable();
     }
 
-    public void enableMethodEntryRequest(VirtualMachine vm) {
-        MethodEntryRequest methodEntryRequest = vm.eventRequestManager().createMethodEntryRequest();
-        var jdiPackagePrefix = "com.sun.tools.jdi.*";
-        //methodEntryRequest.addClassFilter(jdiPackagePrefix);
-        //methodEntryRequest.addClassFilter(debugClass.getName());
-        //methodEntryRequest.addClassFilter(DummyClass.class.getName());
+    public void enableMethodEntryRequest() {
+        var methodEntryRequest = vm.eventRequestManager().createMethodEntryRequest();
         filteredClasses.forEach(methodEntryRequest::addClassExclusionFilter);
         methodEntryRequest.enable();
     }
 
-    public VirtualMachine connectAndLaunchVM() throws Exception {
-        LaunchingConnector launchingConnector = Bootstrap.virtualMachineManager()
-                .defaultConnector();
-        Map<String, Connector.Argument> arguments = launchingConnector.defaultArguments();
-        arguments.get("main").setValue(debugClass.getName());
-        var vm = launchingConnector.launch(arguments);
-        //vm.eventRequestManager().createMethodEntryRequest().enable();
+    public void connectAndLaunchVM() throws Exception {
+        var launchingConnector = Bootstrap.virtualMachineManager().defaultConnector();
+        var arguments = launchingConnector.defaultArguments();
 
-        return vm;
+        var invocationPath = System.getProperty("user.dir") + "\\" + this.debugJar;
+        arguments.get("options").setValue("-cp " + invocationPath);
+
+        var mainClass = getManifestMain(invocationPath);
+        System.out.println(mainClass);
+        arguments.get("main").setValue(mainClass);
+
+        vm = launchingConnector.launch(arguments);
     }
 
-    public void setBreakPoints(VirtualMachine vm, ClassPrepareEvent event) throws AbsentInformationException {
-        ClassType classType = (ClassType) event.referenceType();
-        for(int lineNumber: breakPointLines) {
-            Location location = classType.locationsOfLine(lineNumber).get(0);
-            BreakpointRequest bpReq = vm.eventRequestManager().createBreakpointRequest(location);
-            bpReq.enable();
-        }
-    }
-
-    public void displayVariables(LocatableEvent event) throws IncompatibleThreadStateException,
-            AbsentInformationException {
-        StackFrame stackFrame = event.thread().frame(0);
-        if(stackFrame.location().toString().contains(debugClass.getName())) {
-            Map<LocalVariable, Value> visibleVariables = stackFrame
-                    .getValues(stackFrame.visibleVariables());
-            System.out.println("Variables at " + stackFrame.location().toString() +  " > ");
-            for (Map.Entry<LocalVariable, Value> entry : visibleVariables.entrySet()) {
-                System.out.println(entry.getKey().name() + " = " + entry.getValue());
-            }
-        }
-    }
-
-    public Class getDebugClass() {
-        return debugClass;
-    }
-
-    public void setDebugClass(Class debugClass) {
-        this.debugClass = debugClass;
-    }
-
-    public int[] getBreakPointLines() {
-        return breakPointLines;
-    }
-
-    public void setBreakPointLines(int[] breakPointLines) {
-        this.breakPointLines = breakPointLines;
+    private String getManifestMain(String path) throws IOException {
+        var jar = new JarFile(path);
+        var main = jar.getManifest().getMainAttributes().getValue("Main-Class");
+        jar.close();
+        return main;
     }
 
 }

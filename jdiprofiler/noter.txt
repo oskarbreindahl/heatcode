@@ -1,2 +1,12 @@
 compile med -g flag -> debugger information "Generate all debugging info"
 compile dummy -> debuggee -> debugger (intellij?)
+
+
+når der bygges: få en jar fra brugeren, compile en jar hvor den er exploded inde i (eller kan den dynamisk loades på runtime så der ikke behøves compiles for hver end user?)
+
+antagelse: brugeren oversætter deres program med -g flag
+
+filter lambdas
+get main from manifest
+allow custom filters
+robust path finding
