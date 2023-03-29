@@ -13,7 +13,7 @@ public class SourcePrinter {
 
     public static void main(String[] args) {
         try {
-            makeJSONOutput("../test.json");
+            makeJSONOutput("../out.json");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -1,3 +1,4 @@
+java -jar ./jars/jdicli.jar "$1"
 rm -rf decomps
 mkdir decomps
 cd decomps
