@@ -1,7 +1,7 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import { fetchAnalyzed } from './services/analyzeService';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import { fetchAnalyzed } from "./services/analyzeService";
 
 function App() {
   return (
@@ -11,9 +11,7 @@ function App() {
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
-        <p>
-          {"Methods: " + fetchAnalyzed().map(m => m.referencename)}
-        </p>
+        <p>{"Methods: " + fetchAnalyzed().map((m) => m.referencename)}</p>
         <a
           className="App-link"
           href="https://reactjs.org"

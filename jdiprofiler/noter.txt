@@ -10,3 +10,4 @@ filter lambdas
 get main from manifest
 allow custom filters
 robust path finding
+queue for vm events? undgå thread blocking

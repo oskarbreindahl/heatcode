@@ -1,7 +1,11 @@
 import com.sun.jdi.*;
 import com.sun.jdi.event.*;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.jar.JarFile;
 
@@ -19,6 +23,7 @@ public class JDIExampleDebugger {
         enableClassPrepareRequest();
         enableMethodEntryRequest();
     }
+
     public void run() throws Exception {
         try {
             EventSet eventSet = null;
@@ -38,7 +43,8 @@ public class JDIExampleDebugger {
         } catch (VMDisconnectedException e) {
             System.out.println("Virtual Machine is disconnected.");
             //callContainer.print();
-            System.out.println(JsonSerializer.serialize(callContainer));
+            var output = JsonSerializer.serialize(callContainer);
+            writeToFile(output);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -65,10 +71,14 @@ public class JDIExampleDebugger {
         var launchingConnector = Bootstrap.virtualMachineManager().defaultConnector();
         var arguments = launchingConnector.defaultArguments();
 
-        var invocationPath = System.getProperty("user.dir") + "\\" + this.debugJar;
-        arguments.get("options").setValue("-cp " + invocationPath);
+        var debuggerLocation = new File(JDIExampleDebugger.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 
-        var mainClass = getManifestMain(invocationPath);
+        arguments.get("options").setValue("-cp " + debuggerLocation + ";" + debugJar);
+        System.out.println(debuggerLocation);
+        System.out.println(debugJar);
+        System.out.println(arguments.get("options"));
+
+        var mainClass = getManifestMain(debugJar);
         System.out.println(mainClass);
         arguments.get("main").setValue(mainClass);
 
@@ -80,6 +90,12 @@ public class JDIExampleDebugger {
         var main = jar.getManifest().getMainAttributes().getValue("Main-Class");
         jar.close();
         return main;
+    }
+
+    private void writeToFile(String output) throws IOException {
+        var writer = new BufferedWriter(new FileWriter("out.json"));
+        writer.write(output);
+        writer.close();
     }
 
 }

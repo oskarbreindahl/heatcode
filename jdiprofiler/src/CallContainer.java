@@ -43,7 +43,7 @@ public class CallContainer implements JsonSerializable {
                 jsonGenerator.writeStartObject();
 
                 jsonGenerator.writeFieldName("name");
-                jsonGenerator.writeString(method.declaringType().name() + "." + method.name() + "()");
+                jsonGenerator.writeString(method.declaringType().name() + "." + method.name());
 
                 jsonGenerator.writeFieldName("calls");
                 jsonGenerator.writeNumber(calls);

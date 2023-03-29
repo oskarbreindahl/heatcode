@@ -5,7 +5,6 @@ import java.io.IOException;
 public class JsonSerializer {
     public static String serialize(Object o) throws IOException {
         var mapper = new ObjectMapper();
-        return mapper.writerWithDefaultPrettyPrinter()
-                     .writeValueAsString(o);
+        return mapper.writeValueAsString(o);
     }
 }

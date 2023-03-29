@@ -1,0 +1,12 @@
+{
+  "methods": [
+    {
+      "name": "x.y()",
+      "calls": 50
+    },
+    {
+      "name": "foo.bar()",
+      "calls": 1
+    }
+  ]
+}
