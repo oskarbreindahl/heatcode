@@ -1,7 +1,10 @@
+rm -rf decomps
 mkdir decomps
 cd decomps
 jar xf "$1"
 rm -rf META-INF
+rm .*
 cd ..
-java -jar ./jars/fernflower.jar ./decomps/*.class ./decomps
-rm -rf ./decomps/*.class
+for dir in ./decomps/*; do (java -jar ./jars/fernflower.jar "$dir" ./decomps); done
+cd decomps
+find . -name "*.class" -type f -delete
