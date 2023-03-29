@@ -101,7 +101,7 @@ public class JDIExampleDebugger {
         String separator;
         if (isWindows(os)) {
             separator = ";";
-        } else if (isUnix(os)) {
+        } else if (isUnix(os) || isMac(os))  {
             separator = ":";
         } else {
             throw new IllegalArgumentException("unknown os");
@@ -115,13 +115,17 @@ public class JDIExampleDebugger {
         return sb.toString();
     }
 
-    private boolean isUnix(String name) {
+    private boolean isUnix(String os) {
         var substrings = List.of("nix", "nux", "aix");
-        return substrings.stream().anyMatch(s -> name.contains(s));
+        return substrings.stream().anyMatch(s -> os.contains(s));
     }
 
-    private boolean isWindows(String name) {
-        return name.contains("win");
+    private boolean isWindows(String os) {
+        return os.contains("win");
+    }
+
+    private boolean isMac(String os) {
+        return os.contains("mac");
     }
 
 }
