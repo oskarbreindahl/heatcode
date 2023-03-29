@@ -71,12 +71,7 @@ public class JDIExampleDebugger {
         var launchingConnector = Bootstrap.virtualMachineManager().defaultConnector();
         var arguments = launchingConnector.defaultArguments();
 
-        var debuggerLocation = new File(JDIExampleDebugger.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-
-        arguments.get("options").setValue("-cp " + debuggerLocation + ";" + debugJar);
-        System.out.println(debuggerLocation);
-        System.out.println(debugJar);
-        System.out.println(arguments.get("options"));
+        arguments.get("options").setValue(buildOptions());
 
         var mainClass = getManifestMain(debugJar);
         System.out.println(mainClass);
@@ -96,6 +91,37 @@ public class JDIExampleDebugger {
         var writer = new BufferedWriter(new FileWriter("out.json"));
         writer.write(output);
         writer.close();
+    }
+
+    private String buildOptions() throws Exception {
+        var debuggerLocation = new File(JDIExampleDebugger.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+        var os = System.getProperty("os.name").toLowerCase();
+
+        String separator;
+        if (isWindows(os)) {
+            separator = ";";
+        } else if (isUnix(os)) {
+            separator = ":";
+        } else {
+            throw new IllegalArgumentException("unknown os");
+        }
+
+        var sb = new StringBuilder("-cp ");
+        sb.append(debuggerLocation);
+        sb.append(separator);
+        sb.append(debugJar);
+
+        return sb.toString();
+    }
+
+    private boolean isUnix(String name) {
+        var substrings = List.of("nix", "nux", "aix");
+        return substrings.stream().anyMatch(s -> name.contains(s));
+    }
+
+    private boolean isWindows(String name) {
+        return name.contains("win");
     }
 
 }
