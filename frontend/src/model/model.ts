@@ -1,5 +1,5 @@
 export interface Method {
-    package: string
+    package: string;
     referencename: string;
     calls: number;
     source: string;

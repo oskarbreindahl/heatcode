@@ -3,7 +3,6 @@ import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import { CardActionArea } from '@mui/material';
 import "./App.css";
 import { fetchAnalyzed } from "./services/analyzeService";
 
@@ -38,13 +37,9 @@ function App() {
                       <Typography gutterBottom variant="h5" component="div" color='black'>
                         {"Method: " + m.referencename}
                       </Typography>
-                      <div
-                        style={{
-                          background: 'black',
-                          height: '2px',
-                          width: screenWidth / 2
-                        }}
-                      />
+                      <Typography variant="h5" component="div" color='black' marginTop={1} marginBottom={1}>
+                        {"Package / Class: " + m.package}
+                      </Typography>
                       <Typography variant="h5" component="div" color='black' marginTop={1}>
                         {"Calls: " + m.calls}
                       </Typography>

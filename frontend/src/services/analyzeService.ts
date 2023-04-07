@@ -4,6 +4,7 @@ import data from "../sourcePrinterOut.json";
 
 export interface MethodDto {
   name: string;
+  package: string;
   calls: number;
   source: string;
 }

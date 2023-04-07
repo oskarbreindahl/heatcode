@@ -41,7 +41,18 @@ public class SourcePrinter {
             jsonWriter.key("name");
             String[] nameArr = jsonArr.getJSONObject(i).getString("name").split("[.]");
             String name = nameArr[nameArr.length - 1];
+            String packageName = "";
+            for (int j = 0; j < nameArr.length - 1; j++) {
+                if (j == (nameArr.length - 2)) {
+                    packageName += nameArr[j];
+                    continue;
+                }
+                packageName += (nameArr[j]) + ".";
+            }
             jsonWriter.value(name);
+
+            jsonWriter.key("package");
+            jsonWriter.value(packageName);
 
             jsonWriter.key("calls");
             jsonWriter.value(jsonArr.getJSONObject(i).getInt("calls"));
