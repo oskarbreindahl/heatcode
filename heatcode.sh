@@ -9,3 +9,10 @@ cd ..
 for dir in ./decomps/*; do (java -jar ./jars/fernflower.jar "$dir" ./decomps); done
 cd decomps
 find . -name "*.class" -type f -delete
+cd ..
+cd SourcePrinter
+java -cp .:../jars/json.jar SourcePrinter
+mv sourcePrinterOut.json "../frontend/src"
+cd ..
+cd frontend
+npm start

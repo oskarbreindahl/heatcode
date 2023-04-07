@@ -32,6 +32,10 @@ public class SourcePrinter {
 
         for (int i = 0; i < jsonArr.length(); i++)
         {
+            if (jsonArr.getJSONObject(i).getString("name").contains("<init>")) {
+                continue;
+            }
+            
             jsonWriter.object();
 
             jsonWriter.key("name");
@@ -66,13 +70,13 @@ public class SourcePrinter {
         sb = new StringBuilder();
         Scanner sc = new Scanner(code);
         while (sc.hasNext()) {
-            String nextLine = sc.nextLine().trim();
+            String nextLine = sc.nextLine();
             if (isMethod(nextLine) && nextLine.contains(methodSignature)) {
                 sb.append(nextLine);
+                sb.append("\n");
                 int nestings = 1;
                 while (nestings != 0) {
                     nextLine = sc.nextLine();
-                    sb.append("\n");
                     if (nextLine.contains("{") && (nextLine.contains("}"))) {
                         sb.append(nextLine);
                         sb.append("\n");
